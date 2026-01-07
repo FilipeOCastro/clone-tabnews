@@ -10,8 +10,15 @@ async function query(queryObject) {
   });
 
   await client.connect();
-  const result = await client.query(queryObject);
-  await client.end();
+
+  try {
+    const result = await client.query(queryObject);
+    return result;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    await client.end();
+  }
 }
 
 export default {
