@@ -73,7 +73,7 @@ export default function StatusPage() {
             <div className="grid">
               <Card
                 title="Database Version"
-                value={isLoading ? "Loading..." : database.version}
+                value={isLoading ? "Loading..." : database?.version}
                 loading={isLoading}
               />
 
