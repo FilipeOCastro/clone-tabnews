@@ -1,4 +1,5 @@
 import database from "infra/database.js";
+import password from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors";
 
 async function findOneByUsername(username) {
@@ -23,54 +24,94 @@ async function findOneByUsername(username) {
 }
 
 async function create(userInputValues) {
-  await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
+  await validateUniqueEmail(userInputValues.email);
+  await hashPasswordInObject(userInputValues);
 
   const newUser = await runInsertQuery(userInputValues);
   return newUser;
+}
 
-  async function validateUniqueEmail(email) {
-    const result = await database.query({
-      text: "SELECT email FROM users WHERE LOWER(email) = LOWER($1) ;",
-      values: [email],
-    });
+async function update(username, userInputValues) {
+  const currentUser = await findOneByUsername(username);
 
-    if (result.rowCount > 0) {
-      throw new ValidationError({
-        message: "Email já utilizado.",
-        action: "Utilize outro email.",
-      });
-    }
+  if ("username" in userInputValues) {
+    await validateUniqueUsername(userInputValues.username);
   }
-  async function validateUniqueUsername(username) {
-    const result1 = await database.query({
-      text: "SELECT username FROM users WHERE LOWER(username) = LOWER($1) ;",
-      values: [username],
-    });
+  if ("email" in userInputValues) {
+    await validateUniqueEmail(userInputValues.email);
+  }
+  if ("password" in userInputValues) {
+    await hashPasswordInObject(userInputValues);
+  }
 
-    if (result1.rowCount > 0) {
-      throw new ValidationError({
-        message: "Username já utilizado.",
-        action: "Utilize outro username.",
-      });
-    }
-  }
-  async function runInsertQuery(userInputValues) {
-    const result = await database.query({
-      text: "INSERT INTO users (username, email, password) VALUES ($1,$2,$3) RETURNING * ;",
-      values: [
-        userInputValues.username,
-        userInputValues.email,
-        userInputValues.password,
-      ],
+  const userWithNewValues = { ...currentUser, ...userInputValues };
+
+  const updatedUser = await runUpdateQuery(userWithNewValues);
+  return updatedUser;
+}
+
+async function runInsertQuery(userInputValues) {
+  const result = await database.query({
+    text: "INSERT INTO users (username, email, password) VALUES ($1,$2,$3) RETURNING * ;",
+    values: [
+      userInputValues.username,
+      userInputValues.email,
+      userInputValues.password,
+    ],
+  });
+  return result.rows[0];
+}
+
+async function validateUniqueUsername(username) {
+  const result1 = await database.query({
+    text: "SELECT username FROM users WHERE LOWER(username) = LOWER($1) ;",
+    values: [username],
+  });
+  if (result1.rowCount > 0) {
+    throw new ValidationError({
+      message: "Username já utilizado.",
+      action: "Utilize outro username para esta operação.",
     });
-    return result.rows[0];
   }
+}
+
+async function validateUniqueEmail(email) {
+  const result = await database.query({
+    text: "SELECT email FROM users WHERE LOWER(email) = LOWER($1) ;",
+    values: [email],
+  });
+
+  if (result.rowCount > 0) {
+    throw new ValidationError({
+      message: "Email já utilizado.",
+      action: "Utilize outro email.",
+    });
+  }
+}
+
+async function runUpdateQuery(userWithNewValues) {
+  const result = await database.query({
+    text: "UPDATE users SET username = $2, email = $3, password = $4, updated_at = timezone('utc', now()) WHERE id = $1 RETURNING * ",
+    values: [
+      userWithNewValues.id,
+      userWithNewValues.username,
+      userWithNewValues.email,
+      userWithNewValues.password,
+    ],
+  });
+  return result.rows[0];
+}
+
+async function hashPasswordInObject(userInputValues) {
+  const hashedPassword = await password.hash(userInputValues.password);
+  userInputValues.password = hashedPassword;
 }
 
 const user = {
   create,
   findOneByUsername,
+  update,
 };
 
 export default user;
