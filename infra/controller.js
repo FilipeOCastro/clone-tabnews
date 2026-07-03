@@ -33,7 +33,7 @@ async function clearSessionCookie(response) {
     path: "/",
     maxAge: -1,
     secure: process.env.NODE_ENV === "production",
-    httpOnly: true,    
+    httpOnly: true,
   });
   response.setHeader("set-cookie", setCookie);
 }
@@ -49,14 +49,13 @@ async function setSessionCookie(sessionToken, response) {
   response.setHeader("set-cookie", setCookie);
 }
 
-
 const controller = {
   errorHandlers: {
     onNoMatch: onNoMatchHandler,
     onError: onErrorHandler,
   },
   setSessionCookie,
-  clearSessionCookie
+  clearSessionCookie,
 };
 
 export default controller;

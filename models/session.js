@@ -92,7 +92,7 @@ async function expiredById(sessionId) {
           id = $1
         RETURNING * ;`,
       values: [sessionId],
-    });    
+    });
     return results.rows[0];
   }
 }
@@ -102,7 +102,7 @@ const session = {
   EXPIRATION_IN_MILLISECONDS,
   findOneValidByToken,
   renew,
-  expiredById
+  expiredById,
 };
 
 export default session;

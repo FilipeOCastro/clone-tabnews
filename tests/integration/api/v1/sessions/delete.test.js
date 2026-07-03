@@ -11,7 +11,6 @@ beforeAll(async () => {
 
 describe("DELETE /api/v1/sessions", () => {
   describe("Default user", () => {
-    
     test("With nonexistent session", async () => {
       const nonexistentToken =
         "ea439e45270bb60979c5c73d57fc20cd08037d5fa90da5922b856a6e7769ab355a41ebd3490377124e1c0141165b1008";
@@ -68,7 +67,7 @@ describe("DELETE /api/v1/sessions", () => {
         username: "userWithValidSession1",
       });
 
-      const sessionObject = await orchestrator.createSession(createdUser.id);         
+      const sessionObject = await orchestrator.createSession(createdUser.id);
       const response2 = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "DELETE",
         headers: {
@@ -76,15 +75,15 @@ describe("DELETE /api/v1/sessions", () => {
         },
       });
 
-      expect(response2.status).toBe(200);    
+      expect(response2.status).toBe(200);
 
       const response2Body = await response2.json();
-      
+
       expect(response2Body).toEqual({
         id: sessionObject.id,
         token: sessionObject.token,
         user_id: sessionObject.user_id,
-        expires_at: response2Body.expires_at,       
+        expires_at: response2Body.expires_at,
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
       });
@@ -93,9 +92,12 @@ describe("DELETE /api/v1/sessions", () => {
       expect(Date.parse(response2Body.created_at)).not.toBeNaN();
       expect(Date.parse(response2Body.updated_at)).not.toBeNaN();
 
-     
-      expect(response2Body.expires_at < sessionObject.expires_at.toISOString()).toEqual(true);
-      expect(response2Body.updated_at > sessionObject.updated_at.toISOString()).toEqual(true);
+      expect(
+        response2Body.expires_at < sessionObject.expires_at.toISOString(),
+      ).toEqual(true);
+      expect(
+        response2Body.updated_at > sessionObject.updated_at.toISOString(),
+      ).toEqual(true);
 
       //set cookie assertion
       const parsedSetCookie = setCookieParser(response2, {

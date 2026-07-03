@@ -25,13 +25,11 @@ async function postHandler(request, response) {
 }
 
 async function deleteHandler(request, response) {
-
   const sessionToken = request.cookies.session_id;
   const sessionObject = await session.findOneValidByToken(sessionToken);
   const expiredSessionObject = await session.expiredById(sessionObject.id);
   console.log(expiredSessionObject);
   controller.clearSessionCookie(response);
-  
-  return response.status(200).json(expiredSessionObject);
 
+  return response.status(200).json(expiredSessionObject);
 }
