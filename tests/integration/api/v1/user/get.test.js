@@ -17,7 +17,6 @@ describe("GET /api/v1/user", () => {
       });
 
       const sessionObject = await orchestrator.createSession(createdUser.id);
-      console.log(sessionObject);
       const response2 = await fetch("http://localhost:3000/api/v1/user", {
         headers: {
           Cookie: `session_id=${sessionObject.token}`,
