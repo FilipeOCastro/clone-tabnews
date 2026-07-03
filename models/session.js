@@ -5,12 +5,12 @@ import { UnauthorizedError } from "infra/errors.js";
 const EXPIRATION_IN_MILLISECONDS = 60 * 60 * 24 * 30 * 1000; // 30 days
 
 async function findOneValidByToken(sessionToken) {
-  const sessionFound = await runSelectQuery(sessionToken)
-  return  sessionFound;
+  const sessionFound = await runSelectQuery(sessionToken);
+  return sessionFound;
 
-  async function runSelectQuery(sessionToken){
+  async function runSelectQuery(sessionToken) {
     const results = await database.query({
-      text:`
+      text: `
       SELECT
        *
        FROM 
@@ -18,18 +18,18 @@ async function findOneValidByToken(sessionToken) {
        WHERE 
         token = $1
         AND expires_at > NOW()
-       LIMIT 1 ;` ,
-      values: [sessionToken]
-    })
+       LIMIT 1 ;`,
+      values: [sessionToken],
+    });
 
-        if (results.rowCount === 0) {
-          throw new UnauthorizedError({
-            message: "Usuário não possui sessão válida.",
-            action: "Verifique se o usuário está logado e tente novamente.",
-          });
-        }
+    if (results.rowCount === 0) {
+      throw new UnauthorizedError({
+        message: "Usuário não possui sessão válida.",
+        action: "Verifique se o usuário está logado e tente novamente.",
+      });
+    }
 
-    return results.rows[0]
+    return results.rows[0];
   }
 }
 
@@ -52,18 +52,16 @@ async function create(userId) {
     });
     return results.rows[0];
   }
-
-  
 }
 
 async function renew(sessionId) {
   const expiresAt = new Date(Date.now() + EXPIRATION_IN_MILLISECONDS);
-    const renewdSessionObject = await runUpdateQuery(sessionId, expiresAt);
-    return renewdSessionObject;
+  const renewdSessionObject = await runUpdateQuery(sessionId, expiresAt);
+  return renewdSessionObject;
 
-    async function runUpdateQuery(sessionId, expiresAt) {      
-      const results = await database.query({
-        text: `
+  async function runUpdateQuery(sessionId, expiresAt) {
+    const results = await database.query({
+      text: `
         UPDATE 
           sessions
         SET
@@ -72,11 +70,11 @@ async function renew(sessionId) {
         WHERE
           id = $1
         RETURNING * ;`,
-        values: [sessionId, expiresAt],
-      });
-      return results.rows[0];
-    }
+      values: [sessionId, expiresAt],
+    });
+    return results.rows[0];
   }
+}
 
 const session = {
   create,

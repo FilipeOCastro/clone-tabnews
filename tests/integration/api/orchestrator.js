@@ -39,18 +39,18 @@ async function createUser(userObject) {
     email: userObject.email || faker.internet.email(),
     password: userObject.password || "validpassword",
   });
-};
+}
 
-  async function createSession(userId) {
-    return await session.create(userId);
-};
+async function createSession(userId) {
+  return await session.create(userId);
+}
 
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
   runPendingMigrations,
   createUser,
-  createSession
+  createSession,
 };
 
 export default orchestrator;

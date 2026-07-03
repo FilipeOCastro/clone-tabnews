@@ -155,7 +155,7 @@ const user = {
   findOneByUsername,
   update,
   findOneByEmail,
-  findOneById
+  findOneById,
 };
 
 export default user;
