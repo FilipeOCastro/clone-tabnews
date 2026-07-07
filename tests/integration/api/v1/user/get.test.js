@@ -99,7 +99,6 @@ describe("GET /api/v1/user", () => {
         path: "/",
         httpOnly: true,
       });
-      
     });
     test("With expired session", async () => {
       jest.useFakeTimers({
@@ -141,7 +140,6 @@ describe("GET /api/v1/user", () => {
         path: "/",
         httpOnly: true,
       });
-
     });
   });
 });

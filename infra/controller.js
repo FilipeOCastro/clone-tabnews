@@ -9,7 +9,7 @@ import {
 } from "infra/errors";
 
 function onErrorHandler(error, request, response) {
-  if (error instanceof ValidationError ||  error instanceof NotFoundError) {
+  if (error instanceof ValidationError || error instanceof NotFoundError) {
     return response.status(error.statusCode).json(error);
   }
 
