@@ -41,15 +41,22 @@ describe("Use case: Registration flow (all successful)", () => {
   test("Receive activation email", async () => {
     const lastEmail = await orchestrator.getLastEmail();
 
-    const activationToken = await activation.findOneByUserId(
-      createdUserResponseBody.id,
-    );
+    const inicio =
+      lastEmail.text.indexOf("/activations/") + "/activations/".length;
+    const fim = lastEmail.text.indexOf("\n", inicio);
+
+    const extractToken = lastEmail.text.substring(inicio, fim).trim();
 
     expect(lastEmail.sender).toBe("<contato@gmail.com>");
     expect(lastEmail.recipients[0]).toBe("<registrationflow@gmail.com>");
     expect(lastEmail.subject).toBe("Ative seu cadastro.");
     expect(lastEmail.subject).toBe("Ative seu cadastro.");
-    expect(lastEmail.text).toContain(activationToken.id);
+    expect(lastEmail.text).toContain(extractToken);
+
+    const activeToken = await activation.findOneByToken(extractToken);
+
+    expect(activeToken).not.toBeNull();
+    expect(activeToken.user_id).toBe(createdUserResponseBody.id);
   });
 
   test("Activate account", async () => {});
