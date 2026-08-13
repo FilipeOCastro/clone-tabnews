@@ -1,8 +1,9 @@
 import email from "infra/email.js";
 import database from "infra/database.js";
 import webserver from "infra/webserver.js";
-import { NotFoundError } from "infra/errors";
+import { ForbiddenError, NotFoundError } from "infra/errors";
 import user from "models/user.js";
+import authorization from "./authorization";
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000; // 15 minutes in milliseconds
 
@@ -26,7 +27,7 @@ async function findOneByToken(token) {
     text: "SELECT * FROM user_activation_tokens WHERE id = $1 and used_at IS NULL AND expires_at > NOW()  LIMIT 1",
     values: [token],
   });
-
+  console.log(result.rowCount);
   if (result.rowCount === 0) {
     throw new NotFoundError({
       message:
@@ -76,6 +77,15 @@ async function markTokenAsUsed(activationTokenId) {
 }
 
 async function activeUserByUserId(userId) {
+  const userToActivate = await user.findOneById(userId);
+
+  if (!authorization.can(userToActivate, "read:activation_token")) {
+    throw new ForbiddenError({
+      message: "Você não pode mais utilizar este token de ativação.",
+      action: "Entre em contato com o suporte.",
+    });
+  }
+
   const activatedUser = await user.setFeatures(userId, [
     "create:session",
     "read:session",
@@ -89,6 +99,7 @@ const activation = {
   findOneByToken,
   markTokenAsUsed,
   activeUserByUserId,
+  EXPIRATION_IN_MILLISECONDS,
 };
 
 export default activation;
