@@ -284,5 +284,46 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       expect(incorrectPasswordMatch).toBe(false);
     });
+    test("With user2 targeting user11", async () => {
+      await orchestrator.createUser({
+        username: "user11",
+        email: "user11@gmail.com",
+      });
+      const user22 = await orchestrator.createUser({
+        username: "user22",
+        email: "user22@gmail.com",
+      });
+
+      const activatedUser2 = await orchestrator.activateUser(user22);
+      const sessionObject2 = await orchestrator.createSession(
+        activatedUser2.id,
+      );
+
+      const response2 = await fetch(
+        "http://localhost:3000/api/v1/users/user11",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject2.token}`,
+          },
+          body: JSON.stringify({
+            username: "user33",
+          }),
+        },
+      );
+
+      expect(response2.status).toBe(403);
+
+      const response2Body = await response2.json();
+
+      expect(response2Body).toEqual({
+        action:
+          "Verifique se você possui a permissão necessária para atualizar o usuário.",
+        message: "Você não tem permissão para atualizar este usuário.",
+        name: "ForbiddenError",
+        status_code: 403,
+      });
+    });
   });
 });
