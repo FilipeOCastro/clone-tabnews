@@ -14,7 +14,6 @@ describe("PATCH /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("With uique'username'", async () => {
       const createdUser = await orchestrator.createUser({});
-
       const newUsername = faker.internet.username().replace(/[_.-]/g, "");
       const response2 = await fetch(
         `http://localhost:3000/api/v1/users/${createdUser.username}`,
