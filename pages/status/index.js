@@ -72,6 +72,7 @@ export default function StatusPage() {
 
             <div className="grid">
               <Card
+                display={database?.version == null ? "none" : "block"}
                 title="Database Version"
                 value={isLoading ? "Loading..." : database?.version}
                 loading={isLoading}
@@ -332,9 +333,9 @@ export default function StatusPage() {
   );
 }
 
-function Card({ title, value, loading, success }) {
+function Card({ title, value, loading, success, display = "block" }) {
   return (
-    <div className={`card ${loading ? "loading" : ""}`}>
+    <div className={`card ${loading ? "loading" : ""}`} style={{ display }}>
       <div className="card-title">{title}</div>
 
       <div className={`card-value ${success ? "success-text" : ""}`}>
