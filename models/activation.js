@@ -41,7 +41,7 @@ async function findOneByToken(token) {
 
 async function sendEmailToUser(user, activationToken) {
   await email.send({
-    from: "FinTab <contato@gmail.com>",
+    from: "FOC <contato@filipeocastro.dev.br>",
     to: user.email,
     subject: "Ative seu cadastro.",
     text: `Olá ${user.username}, para ativar seu cadastro, clique no link abaixo:
@@ -49,7 +49,7 @@ async function sendEmailToUser(user, activationToken) {
 ${webserver.origin}/api/v1/activations/${activationToken.id}
     
 Atenciosamente,
-Equipe FinTab
+Equipe FOC
 `,
   });
 }
