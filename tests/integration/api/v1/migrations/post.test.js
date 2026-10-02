@@ -1,4 +1,5 @@
 import orchestrator from "../../orchestrator.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -9,13 +10,10 @@ beforeAll(async () => {
 describe("POST /api/v1/migrations", () => {
   describe("Anonymous user", () => {
     describe("Running pending migrations", () => {
-      test("Retrieving pending migrations", async () => {
-        const response1 = await fetch(
-          "http://localhost:3000/api/v1/migrations",
-          {
-            method: "POST",
-          },
-        );
+      test("Running pending migrations", async () => {
+        const response1 = await fetch(`${webserver.origin}/api/v1/migrations`, {
+          method: "POST",
+        });
         expect(response1.status).toBe(403);
 
         const response1Body = await response1.json();
@@ -32,21 +30,18 @@ describe("POST /api/v1/migrations", () => {
 
   describe("Default user", () => {
     describe("Running pending migrations", () => {
-      test("Retrieving pending migrations", async () => {
+      test("Running pending migrations", async () => {
         const createdUser = await orchestrator.createUser();
         const activateUser = await orchestrator.activateUser(createdUser);
-        const sessionObject = await orchestrator.createSession(activateUser.id);
+        const sessionObject = await orchestrator.createSession(activateUser);
 
-        const response1 = await fetch(
-          "http://localhost:3000/api/v1/migrations",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Cookie: `session_id=${sessionObject.token}`,
-            },
+        const response1 = await fetch(`${webserver.origin}/api/v1/migrations`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
           },
-        );
+        });
         expect(response1.status).toBe(403);
 
         const response1Body = await response1.json();
@@ -67,17 +62,14 @@ describe("POST /api/v1/migrations", () => {
         const createdUser = await orchestrator.createUser();
         const activateUser = await orchestrator.activateUser(createdUser);
         await orchestrator.addFeatureToUser(createdUser, ["create:migration"]);
-        const sessionObject = await orchestrator.createSession(activateUser.id);
-        const response1 = await fetch(
-          "http://localhost:3000/api/v1/migrations",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Cookie: `session_id=${sessionObject.token}`,
-            },
+        const sessionObject = await orchestrator.createSession(activateUser);
+        const response1 = await fetch(`${webserver.origin}/api/v1/migrations`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
           },
-        );
+        });
         expect(response1.status).toBe(200);
 
         const response1Body = await response1.json();

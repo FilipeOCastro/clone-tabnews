@@ -4,11 +4,10 @@ import user from "models/user.js";
 import authorization from "models/authorization.js";
 import { ForbiddenError } from "infra/errors.js";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(gettHandler);
-router.patch(controller.canRequest("update:user"), patchtHandler);
+const router = createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(gettHandler)
+  .patch(controller.canRequest("update:user"), patchtHandler);
 
 export default router.handler(controller.errorHandlers);
 

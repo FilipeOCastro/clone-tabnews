@@ -3,10 +3,7 @@ import database from "infra/database.js";
 import controller from "infra/controller.js";
 import authorization from "models/authorization.js";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(status);
+const router = createRouter().use(controller.injectAnonymousOrUser).get(status);
 
 export default router.handler(controller.errorHandlers);
 
@@ -45,5 +42,5 @@ async function status(request, response) {
     statusObject,
   );
 
-  response.status(200).json(secureOutputValues);
+  return response.status(200).json(secureOutputValues);
 }
