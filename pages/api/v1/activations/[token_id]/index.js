@@ -3,10 +3,9 @@ import controller from "infra/controller.js";
 import activation from "models/activation.js";
 import authorization from "models/authorization.js";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.patch(controller.canRequest("read:activation_token"), patchtHandler);
+const router = createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .patch(controller.canRequest("read:activation_token"), patchtHandler);
 
 export default router.handler(controller.errorHandlers);
 
