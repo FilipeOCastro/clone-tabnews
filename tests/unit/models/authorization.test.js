@@ -57,8 +57,8 @@ describe("models/authorization.js", () => {
         id: 1,
         username: "TestUser",
         features: ["read:user"],
-        created_at: "2026-0101T00:00:00Z",
-        updated_at: "2026-0826T00:00:00Z",
+        created_at: "2026-01-01T00:00:00.000Z",
+        updated_at: "2026-01-01T00:00:00.000Z",
         email: "test@example.com",
         password: "hashedpassword",
       };
@@ -67,8 +67,8 @@ describe("models/authorization.js", () => {
         id: 1,
         username: "TestUser",
         features: ["read:user"],
-        created_at: "2026-0101T00:00:00Z",
-        updated_at: "2026-0826T00:00:00Z",
+        created_at: "2026-01-01T00:00:00.000Z",
+        updated_at: "2026-01-01T00:00:00.000Z",
       });
     });
   });
